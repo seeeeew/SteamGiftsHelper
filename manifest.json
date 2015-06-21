@@ -13,7 +13,7 @@
             	"http://www.steamgifts.com/giveaways/*"
             ],
             "js": [
-            	"js/jquery-2.1.4.min.js",
+            	"js/jquery.min.js",
             	"steamgiftshelper.js"
             ]
     	}
