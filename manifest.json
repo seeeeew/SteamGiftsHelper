@@ -1,0 +1,22 @@
+{
+	"manifest_version": 2,
+	"name": "SteamGifts Helper",
+	"version": "0.2",
+    "permissions": [
+        "http://www.steamgifts.com/",
+        "http://store.steampowered.com/"
+    ],
+    "content_scripts": [
+    	{
+            "matches": [
+            	"http://www.steamgifts.com/",
+            	"http://www.steamgifts.com/giveaways/*"
+            ],
+            "js": [
+            	"js/jquery-2.1.4.min.js",
+            	"steamgiftshelper.js"
+            ]
+    	}
+    ]
+}
+
