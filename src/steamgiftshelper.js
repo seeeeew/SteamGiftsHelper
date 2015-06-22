@@ -1,21 +1,36 @@
-$(function(){
+$(function() {
 	"use strict";
 	
 	var xsrf_token = $("[name=xsrf_token]")[0].value;
 	
-	// restore scroll position after hiding game
-	var scroll = window.location.hash.match(/^#?(\d+)/);
-	if (scroll) {
-		window.scrollTo(0, scroll[1]);
-		history.replaceState({}, document.title, window.location.href.replace(/#.*$/, ""));
+	// replace hiding form with ajax
+	(function ajax_hiding() {
+		var form = $(".popup--hide-games form");
+		var div = $("<div>" + form.html() + "</div>");
+		form.replaceWith(div);
+		$(".popup--hide-games .form__submit-button")[0].onclick = click_ajax_hide;
+	})();
+	
+	function click_ajax_hide() {
+		var game_id = $(".popup--hide-games [name=game_id]")[0].value;
+		$.ajax({
+			method: "POST",
+			url: "",
+			data: "xsrf_token=" + xsrf_token + "&do=hide_giveaways_by_game_id&game_id=" + game_id,
+			context: this,
+			beforeSend: function() {
+				$(this).children(".fa").removeClass("fa-check-circle");
+				$(this).children(".fa").addClass("fa-spin fa-refresh");
+			}
+		}).done(function() {
+			$("[data-game-id=" + game_id + "]").closest(".giveaway__row-outer-wrap").remove();
+			$(".b-close").click();
+			$(this).children(".fa").removeClass("fa-spin fa-refresh");
+			$(this).children(".fa").addClass("fa-check-circle");
+		});
 	}
 	
-	// save scroll position for restoring after hiding games
-	window.onscroll = function() {
-		$(".popup--hide-games form")[0].action = "#" + window.scrollY;
-	}
-	
-	// add platform and enter/remove icons
+	// add platform icons
 	$("a.giveaway__icon[href*='//store.steampowered.com/app/']").each(function() {
 		var match = this.href.match(/^[^:]+:\/\/store.steampowered.com\/app\/(\d+)/);
 		var appid = match[1];
@@ -27,6 +42,8 @@ $(function(){
 			add_platform_icons(this, data[appid].data.platforms);
 		})
 	});
+	
+	// add enter/remove icon
 	$("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").each(function() {
 		var enter_icon = $.parseHTML("<i class='giveaway__icon fa'></i>")[0];
 		this.parentNode.insertBefore(enter_icon, this);
@@ -38,6 +55,7 @@ $(function(){
 			$(enter_icon).addClass("fa-plus-circle");
 		}
 	});
+	
 	function click_enter_icon() {
 		var code = (this.parentNode.firstElementChild.href || {}).match(/\/giveaway\/([^\/\?]+)/);
 		var entered = this.parentWrapper.hasClass("is-faded");
@@ -47,11 +65,11 @@ $(function(){
 				url: "/ajax.php",
 				data: "xsrf_token=" + xsrf_token + "&do=entry_" + (entered ? "delete" : "insert") + "&code=" + code[1],
 				context: this,
-				beforeSend: function(){
+				beforeSend: function() {
 					$(this).removeClass("fa-plus-circle fa-minus-circle");
 					$(this).addClass("fa-spin fa-refresh");
 				}
-			}).done(function(data){
+			}).done(function(data) {
 				var json = $.parseJSON(data);
 				$(this).removeClass("fa-spin fa-refresh");
 				if (json.type == "success") {
