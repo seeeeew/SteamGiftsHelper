@@ -6,4 +6,8 @@ header {
 }
 .featured__container {
 	margin-top: 39px;
+	margin-bottom: -39px;
+}
+.page__outer-wrap {
+	margin-top: 39px;
 }
