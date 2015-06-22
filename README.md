@@ -1,5 +1,5 @@
 # SteamGiftsHelper
-SteamGiftsHelper is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension for that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
+SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension for that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
 
 ## Installation
 1. Activate "developer mode" in the extensions tab
@@ -7,9 +7,12 @@ SteamGiftsHelper is a [Chrome](https://www.google.de/chrome/browser/desktop/) ex
 
 ## Features
 ### Giveway browsing pages
-* Adds platform icons
-* Restores scroll position after hiding a game
+* Add platform icons
+* Restore scroll position after hiding a game
+* Pin the header bar to the top
+* Enter giveaways from browsing page
 
 ## Planned features
-* Hiding games without page refresh
-* Entering giveaways from browsing page
+* Options dialog
+* Hide games without page refresh
+

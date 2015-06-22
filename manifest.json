@@ -1,7 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "SteamGifts Helper",
-	"version": "0.2",
+	"description": "Adds usefull stuff on SteamGifts.com",
+	"version": "0.3",
     "permissions": [
         "http://www.steamgifts.com/",
         "http://store.steampowered.com/"
@@ -15,6 +16,9 @@
             "js": [
             	"js/jquery.min.js",
             	"steamgiftshelper.js"
+            ],
+            "css": [
+            	"css/steamgiftshelper.css"
             ]
     	}
     ]
