@@ -2,8 +2,7 @@
 SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
 
 ## Installation
-1. Activate "developer mode" in the extensions tab
-2. "Load unpacked extension..."
+Download [SteamGiftsHelper.crx](https://github.com/seeeeew/SteamGiftsHelper/raw/master/SteamGiftsHelper.crx) and drag it into Chrome's extension tab.
 
 ## Features
 ### Giveway browsing pages
@@ -15,4 +14,5 @@ SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) e
 ## Planned features
 * Options dialog
 * Hide games without page refresh
+* Infinite scrolling
 
