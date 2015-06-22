@@ -1,5 +1,5 @@
 # SteamGiftsHelper
-SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension for that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
+SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
 
 ## Installation
 1. Activate "developer mode" in the extensions tab
