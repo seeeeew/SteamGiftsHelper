@@ -1,14 +1,17 @@
 {
 	"manifest_version": 2,
 	"name": "SteamGifts Helper",
+	"short_name": "SG-Helper",
 	"description": "Adds usefull stuff on SteamGifts.com",
+	"homepage_url": "https://github.com/seeeeew/SteamGiftsHelper",
 	"icons": {
 		"16": "img/logo16.png",
 		"32": "img/logo32.png",
 		"48": "img/logo48.png",
 		"128": "img/logo128.png"
 	},
-	"version": "0.3",
+	"version": "0.3.1",
+	"update_url": "https://github.com/seeeeew/SteamGiftsHelper/raw/master/updates.xml",
     "permissions": [
         "http://www.steamgifts.com/",
         "http://store.steampowered.com/"
