@@ -10,7 +10,7 @@
 		"48": "img/logo48.png",
 		"128": "img/logo128.png"
 	},
-	"version": "0.5",
+	"version": "0.5.1",
     "permissions": [
         "http://www.steamgifts.com/",
         "http://store.steampowered.com/",
@@ -20,8 +20,7 @@
     "content_scripts": [
     	{
             "matches": [
-            	"http://www.steamgifts.com/",
-            	"http://www.steamgifts.com/giveaways/*"
+            	"http://www.steamgifts.com/*"
             ],
             "js": [
             	"js/jquery.min.js",
