@@ -11,12 +11,11 @@ SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) e
 ## Features
 ### Giveway browsing pages
 * Add platform icons
-* Restore scroll position after hiding a game
 * Pin the header bar to the top
 * Enter giveaways from browsing page
 * Hide games without page refresh
+* Options dialog
 
 ## Planned features
-* Options dialog
 * Infinite scrolling
 
