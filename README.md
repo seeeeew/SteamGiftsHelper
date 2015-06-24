@@ -20,6 +20,10 @@ SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) e
 * Pin the header bar to the top
 * Enter giveaways from browsing page
 * Hide games without page refresh
+* Find similar giveaways
+
+### Giveaway detail pages
+* Find similar giveaways
 
 
 ## Planned features

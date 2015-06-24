@@ -7,7 +7,7 @@ $(chrome.storage.sync.get(function(settings) {
 	}
 	
 	// Giveaway browsing pages
-	if (window.location.pathname.match(/\/(?:$|giveaways\/)/)) {
+	if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 		var xsrf_token = $("[name=xsrf_token]")[0].value;
 		
 		// Add platform support icons
@@ -16,13 +16,13 @@ $(chrome.storage.sync.get(function(settings) {
 				var next = element.nextSibling;
 				var parent = element.parentNode;
 				if (platforms.windows) {
-					parent.insertBefore($.parseHTML("<i class='giveaway__icon fa fa-windows'></i>")[0], next);
+					parent.insertBefore($("<i class='giveaway__icon fa fa-windows'></i>")[0], next);
 				}
 				if (platforms.mac) {
-					parent.insertBefore($.parseHTML("<i class='giveaway__icon fa fa-apple'></i>")[0], next);
+					parent.insertBefore($("<i class='giveaway__icon fa fa-apple'></i>")[0], next);
 				}
 				if (platforms.linux) {
-					parent.insertBefore($.parseHTML("<i class='giveaway__icon fa fa-linux'></i>")[0], next);
+					parent.insertBefore($("<i class='giveaway__icon fa fa-linux'></i>")[0], next);
 				}
 			}
 			
@@ -39,8 +39,7 @@ $(chrome.storage.sync.get(function(settings) {
 			});
 		}
 		
-		// Enable entering giveways from browsing page
-		if ((settings.enter_button || false) === true) {
+		if ((settings.enter_button || false) === true || (settings.browsing_search_similar || false) === true) {
 			function click_enter_icon() {
 				var code = (this.parentNode.firstElementChild.href || {}).match(/\/giveaway\/([^\/\?]+)/);
 				var entered = this.parentWrapper.hasClass("is-faded");
@@ -78,14 +77,28 @@ $(chrome.storage.sync.get(function(settings) {
 			}
 			
 			$("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").each(function() {
-				var enter_icon = $.parseHTML("<i class='giveaway__icon fa'></i>")[0];
-				this.parentNode.insertBefore(enter_icon, this);
-				enter_icon.onclick = click_enter_icon;
-				enter_icon.parentWrapper = $(enter_icon.parentNode.parentNode.parentNode);
-				if (enter_icon.parentWrapper.hasClass("is-faded")) {
-					$(enter_icon).addClass("fa-minus-circle");
-				} else {
-					$(enter_icon).addClass("fa-plus-circle");
+				// Enable entering giveways from browsing page
+				if ((settings.enter_button || false) === true) {
+					var enter_icon = $("<i class='giveaway__icon fa'></i>")[0];
+					this.parentNode.insertBefore(enter_icon, this);
+					enter_icon.onclick = click_enter_icon;
+					enter_icon.parentWrapper = $(enter_icon.parentNode.parentNode.parentNode);
+					if (enter_icon.parentWrapper.hasClass("is-faded")) {
+						$(enter_icon).addClass("fa-minus-circle");
+					} else {
+						$(enter_icon).addClass("fa-plus-circle");
+					}
+				}
+				
+				// Find similar giveaways
+				if ((settings.browsing_search_similar || false) === true) {
+					var giveaway = $(this).parent().children().first();
+					var form_id = "search_" + giveaway[0].href.match(/\/giveaway\/([^\/\?]+)/)[1];
+					var search_icon = $("<form action=/giveaways/search class='search_similar giveaway__icon'><input type=submit><label class='fa fa-search'></label><input type=hidden name=q></form>");
+					search_icon.find("input[name=q]")[0].value = giveaway.text();
+					search_icon.find("[type=submit]")[0].id = form_id;
+					search_icon.find("label").prop("for", form_id);
+					search_icon.insertBefore(this);
 				}
 			});
 		}
@@ -113,6 +126,16 @@ $(chrome.storage.sync.get(function(settings) {
 					$(this).children(".fa").addClass("fa-check-circle");
 				});
 			};
+		}
+	}
+	
+	// Giveaway detail pages
+	if (window.location.pathname.match(/^\/giveaway\//)) {
+		// Find similar giveaways
+		if ((settings.detail_search_similar || false) === true) {
+			var searchbutton = $("<form action=/giveaways/search class=search_similar><input type=submit id=submit><label for=submit class='fa fa-search'></label><input type=hidden name=q></form>");
+			searchbutton.find("input[name=q]")[0].value = $(".featured__heading > :first-child").text();
+			$(".featured__heading").append(searchbutton);
 		}
 	}
 }));

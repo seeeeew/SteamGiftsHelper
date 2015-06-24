@@ -10,7 +10,7 @@
 		"48": "img/logo48.png",
 		"128": "img/logo128.png"
 	},
-	"version": "0.5.1",
+	"version": "0.6",
     "permissions": [
         "http://www.steamgifts.com/",
         "http://store.steampowered.com/",
