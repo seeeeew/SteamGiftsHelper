@@ -1,13 +1,13 @@
-header {
+body.pin_header header {
 	position: fixed;
 	width: 100%;
 	top: 0;
 	z-index: 999;
 }
-.featured__container {
+body.pin_header .featured__container {
 	margin-top: 39px;
 	margin-bottom: -39px;
 }
-.page__outer-wrap {
+body.pin_header .page__outer-wrap {
 	margin-top: 39px;
 }
