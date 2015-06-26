@@ -11,18 +11,9 @@ body.pin_header .featured__container, body.pin_header .header__error {
 body.pin_header .page__outer-wrap {
 	margin-top: 39px;
 }
-.sgh_searchbutton {
-	font-size: 20px;
-}
-.search_similar input[type=submit] {
-	display: none;
-}
-.featured__heading .search_similar label {
+.featured__heading .search_similar {
 	font-size: 20px;
 	opacity: 0.5;
 	cursor: pointer;
 }
-.search_similar.giveaway__icon label {
-	display: block;
-	cursor: pointer;
-}
+

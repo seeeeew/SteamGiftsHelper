@@ -92,12 +92,8 @@ $(chrome.storage.sync.get(function(settings) {
 				
 				// Find similar giveaways
 				if ((settings.browsing_search_similar || false) === true) {
-					var giveaway = $(this).parent().children().first();
-					var form_id = "search_" + giveaway[0].href.match(/\/giveaway\/([^\/\?]+)/)[1];
-					var search_icon = $("<form action=/giveaways/search class='search_similar giveaway__icon'><input type=submit><label class='fa fa-search'></label><input type=hidden name=q></form>");
-					search_icon.find("input[name=q]")[0].value = giveaway.text();
-					search_icon.find("[type=submit]")[0].id = form_id;
-					search_icon.find("label").prop("for", form_id);
+					var game_name = $(this).parent().children().first().text();
+					var search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar giveaway__icon fa fa-search'></a>");
 					search_icon.insertBefore(this);
 				}
 			});
@@ -133,9 +129,9 @@ $(chrome.storage.sync.get(function(settings) {
 	if (window.location.pathname.match(/^\/giveaway\//)) {
 		// Find similar giveaways
 		if ((settings.detail_search_similar || false) === true) {
-			var searchbutton = $("<form action=/giveaways/search class=search_similar><input type=submit id=submit><label for=submit class='fa fa-search'></label><input type=hidden name=q></form>");
-			searchbutton.find("input[name=q]")[0].value = $(".featured__heading > :first-child").text();
-			$(".featured__heading").append(searchbutton);
+			var game_name = $(".featured__heading > :first-child").text();
+			var search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar fa fa-search'></a>");
+			$(".featured__heading").append(search_icon);
 		}
 	}
 }));
