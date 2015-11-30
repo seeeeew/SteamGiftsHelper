@@ -1,8 +1,13 @@
-# SteamGiftsHelper
-SteamGifts Helper is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
+# SteamGifts Helper
+*SteamGifts Helper* is a [Chrome](https://www.google.de/chrome/browser/desktop/) extension that adds usefull stuff on [SteamGifts.com](http://www.steamgifts.com/).
 
 
 ## Installation
+
+You can [install SteamGifts Helper from the Chrome Web Store](https://chrome.google.com/webstore/detail/steamgifts-helper/gmapcmjlcmibnddkiddcgdkljaboobbo)
+
+or you can install it manually:
+
 1. Clone this repository (or [download it as a ZIP file](https://github.com/seeeeew/SteamGiftsHelper/archive/master.zip) and extract it)
 2. Open Chrome's extension tab
 3. Activate developer mode
