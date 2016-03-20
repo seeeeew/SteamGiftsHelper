@@ -161,6 +161,9 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 					$(".b-close").click();
 					$hide_button.children(".fa").removeClass("fa-spin fa-refresh");
 					$hide_button.children(".fa").addClass("fa-check-circle");
+					if ($(".pinned-giveaways__outer-wrap .giveaway__row-outer-wrap").length == 0) {
+						$(".pinned-giveaways__outer-wrap").remove();
+					}
 				});
 			});
 		}
