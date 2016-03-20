@@ -50,7 +50,7 @@ var platforms = (function(cache) {
 		get: get,
 		clear: cache_clear
 	}
-})(JSON.parse(cache.platforms || "{}"));
+})($.parseJSON(cache.platforms || "{}"));
 
 // Pin header bar to top
 if ((settings.pin_header || false) === true) {
@@ -63,15 +63,14 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	if ((settings.platform_icons || false) === true) {
 		function add_platform_icons(element, platforms) {
 			var next = element.nextSibling;
-			var parent = element.parentNode;
 			if (platforms.windows) {
-				parent.insertBefore($("<i class='giveaway__icon fa fa-windows'></i>")[0], next);
+				$("<i class='giveaway__icon fa fa-windows'></i>").insertBefore(next);
 			}
 			if (platforms.mac) {
-				parent.insertBefore($("<i class='giveaway__icon fa fa-apple'></i>")[0], next);
+				$("<i class='giveaway__icon fa fa-apple'></i>").insertBefore(next);
 			}
 			if (platforms.linux) {
-				parent.insertBefore($("<i class='giveaway__icon fa fa-linux'></i>")[0], next);
+				$("<i class='giveaway__icon fa fa-linux'></i>").insertBefore(next);
 			}
 		}
 		
@@ -88,87 +87,82 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	if (xsrf_token) {
 		if ((settings.enter_button || false) === true || (settings.browsing_search_similar || false) === true) {
 			function click_enter_icon() {
-				var code = (this.parentNode.firstElementChild.href || {}).match(/\/giveaway\/([^\/\?]+)/);
-				var entered = this.parentWrapper.hasClass("is-faded");
-				if (code) {
-					$.ajax({
-						method: "POST",
-						url: "/ajax.php",
-						data: "xsrf_token=" + xsrf_token + "&do=entry_" + (entered ? "delete" : "insert") + "&code=" + code[1],
-						context: this,
-						beforeSend: function() {
-							$(this).removeClass("fa-plus-circle fa-minus-circle");
-							$(this).addClass("fa-spin fa-refresh");
-						}
-					}).done(function(data) {
-						var json = $.parseJSON(data);
-						$(this).removeClass("fa-spin fa-refresh");
-						if (json.type == "success") {
-							if (this.parentWrapper.hasClass("is-faded")) {
-								this.parentWrapper.removeClass("is-faded");
-								$(this).addClass("fa-plus-circle");
-							} else {
-								this.parentWrapper.addClass("is-faded");
-								$(this).addClass("fa-minus-circle");
-							}
+				var $enter_icon = $(this);
+				var code = $enter_icon.siblings()[0].href.match(/\/giveaway\/([^\/\?]+)/);
+				var $wrapper = $enter_icon.parents(".giveaway__row-inner-wrap").first();
+				var entered = $wrapper.hasClass("is-faded");
+				$.post({
+					url: "/ajax.php",
+					data: "xsrf_token=" + xsrf_token + "&do=entry_" + (entered ? "delete" : "insert") + "&code=" + code[1],
+					beforeSend: function() {
+						$enter_icon.removeClass("fa-plus-circle fa-minus-circle");
+						$enter_icon.addClass("fa-spin fa-refresh");
+					}
+				}).done(function(data) {
+					var json = $.parseJSON(data);
+					$enter_icon.removeClass("fa-spin fa-refresh");
+					if (json.type == "success") {
+						if ($wrapper.hasClass("is-faded")) {
+							$wrapper.removeClass("is-faded");
+							$enter_icon.addClass("fa-plus-circle");
 						} else {
-							if (this.parentWrapper.hasClass("is-faded")) {
-								$(this).addClass("fa-minus-circle");
-							} else {
-								$(this).addClass("fa-plus-circle");
-							}
+							$wrapper.addClass("is-faded");
+							$enter_icon.addClass("fa-minus-circle");
 						}
-						$(".nav__points").text(json.points);
-					});
-				}
+					} else {
+						if ($wrapper.hasClass("is-faded")) {
+							$enter_icon.addClass("fa-minus-circle");
+						} else {
+							$enter_icon.addClass("fa-plus-circle");
+						}
+					}
+					$(".nav__points").text(json.points);
+				});
 			}
 		
 			$("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").each(function() {
 				// Enable entering giveways from browsing page
 				if ((settings.enter_button || false) === true) {
-					var enter_icon = $("<i class='giveaway__icon fa'></i>")[0];
-					this.parentNode.insertBefore(enter_icon, this);
-					enter_icon.onclick = click_enter_icon;
-					enter_icon.parentWrapper = $(enter_icon.parentNode.parentNode.parentNode);
-					if (enter_icon.parentWrapper.hasClass("is-faded")) {
-						$(enter_icon).addClass("fa-minus-circle");
+					var $enter_icon = $("<i class='giveaway__icon fa'></i>");
+					$enter_icon.insertBefore(this);
+					$enter_icon.click(click_enter_icon);
+					if ($($enter_icon.parents()[2]).hasClass("is-faded")) {
+						$enter_icon.addClass("fa-minus-circle");
 					} else {
-						$(enter_icon).addClass("fa-plus-circle");
+						$enter_icon.addClass("fa-plus-circle");
 					}
 				}
 			
 				// Find similar giveaways
 				if ((settings.browsing_search_similar || false) === true) {
-					var game_name = $(this).parent().children().first().text();
-					var search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar giveaway__icon fa fa-search'></a>");
-					search_icon.insertBefore(this);
+					var game_name = $(this).siblings().first().text();
+					var $search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar giveaway__icon fa fa-search'></a>");
+					$search_icon.insertBefore(this);
 				}
 			});
 		}
 	
 		// Enable hiding games without page refresh
 		if ((settings.ajax_hide || false) === true) {
-			var form = $(".popup--hide-games form");
-			var div = $("<div>" + form.html() + "</div>");
-			form.replaceWith(div);
-			$(".popup--hide-games .form__submit-button")[0].onclick = function() {
-				var game_id = $(".popup--hide-games [name=game_id]")[0].value;
-				$.ajax({
-					method: "POST",
+			var $form = $(".popup--hide-games form");
+			$form.replaceWith("<div>" + $form.html() + "</div>");
+			var $hide_button = $(".popup--hide-games .form__submit-button");
+			$hide_button.click(function() {
+				var game_id = $(".popup--hide-games [name=game_id]").val();
+				$.post({
 					url: "",
 					data: "xsrf_token=" + xsrf_token + "&do=hide_giveaways_by_game_id&game_id=" + game_id,
-					context: this,
 					beforeSend: function() {
-						$(this).children(".fa").removeClass("fa-check-circle");
-						$(this).children(".fa").addClass("fa-spin fa-refresh");
+						$hide_button.children(".fa").removeClass("fa-check-circle");
+						$hide_button.children(".fa").addClass("fa-spin fa-refresh");
 					}
 				}).done(function() {
 					$("[data-game-id=" + game_id + "]").closest(".giveaway__row-outer-wrap").remove();
 					$(".b-close").click();
-					$(this).children(".fa").removeClass("fa-spin fa-refresh");
-					$(this).children(".fa").addClass("fa-check-circle");
+					$hide_button.children(".fa").removeClass("fa-spin fa-refresh");
+					$hide_button.children(".fa").addClass("fa-check-circle");
 				});
-			};
+			});
 		}
 	}
 }
@@ -178,8 +172,8 @@ if (window.location.pathname.match(/^\/giveaway\//)) {
 	// Find similar giveaways
 	if ((settings.detail_search_similar || false) === true) {
 		var game_name = $(".featured__heading > :first-child").text();
-		var search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar fa fa-search'></a>");
-		$(".featured__heading").append(search_icon);
+		var $search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar fa fa-search'></a>");
+		$(".featured__heading").append($search_icon);
 	}
 }
 
