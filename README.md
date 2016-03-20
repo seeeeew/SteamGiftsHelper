@@ -29,8 +29,3 @@ or you can install it manually:
 
 ### Giveaway detail pages
 * Find similar giveaways
-
-
-## Planned features
-* Infinite scrolling
-
