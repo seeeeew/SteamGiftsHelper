@@ -1,5 +1,56 @@
 "use strict";
-$(chrome.storage.sync.get(function(settings) {
+
+var storage_sync_deferred = new $.Deferred();
+chrome.storage.sync.get(storage_sync_deferred.resolve);
+var storage_local_deferred = new $.Deferred();
+chrome.storage.local.get(storage_local_deferred.resolve);
+
+$($.when(storage_sync_deferred, storage_local_deferred).done(function(settings, cache) {
+
+// platform support cache
+var platforms = (function(cache) {
+	
+	function get(appid) {
+		cache_clean();
+		var deferred = new $.Deferred();
+		if (cache[appid] !== undefined) {
+			deferred.resolveWith(null, [cache[appid][0]]);
+		} else {
+			var url = "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + appid;
+			$.get(url).done(function(data) {
+				if (!((data[appid] || {}).data || {}).platforms) return;
+				var platforms = data[appid].data.platforms;
+				cache_set(appid, platforms);
+				deferred.resolveWith(null, [platforms]);
+			});
+		}
+		return deferred.promise();
+	}
+	
+	function cache_clean() {
+		var expire_time = parseInt(Date.now() / 1000, 10) - 1 * 60 * 60; // One hour ago
+		$.each(cache, function(key, values) {
+			if (values[1] < expire_time) {
+				delete cache[key];
+			}
+		});
+	}
+	
+	function cache_set(appid, platforms) {
+		cache[appid] = [platforms, parseInt(Date.now() / 1000, 10)];
+		chrome.storage.local.set({platforms: JSON.stringify(cache)});
+	}
+	
+	function cache_clear() {
+		cache = {};
+		chrome.storage.local.set({platforms: JSON.stringify(cache)});
+	}
+	
+	return {
+		get: get,
+		clear: cache_clear
+	}
+})(JSON.parse(cache.platforms || "{}"));
 
 // Pin header bar to top
 if ((settings.pin_header || false) === true) {
@@ -27,13 +78,9 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 		$("a.giveaway__icon[href*='//store.steampowered.com/app/']").each(function() {
 			var match = this.href.match(/^[^:]+:\/\/store.steampowered.com\/app\/(\d+)/);
 			var appid = match[1];
-			$.ajax({
-				url: "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + appid,
-				context: this
-			}).done(function(data) {
-				if (!((data[appid] || {}).data || {}).platforms) return;
-				add_platform_icons(this, data[appid].data.platforms);
-			})
+			platforms.get(appid).done((function(platforms) {
+				add_platform_icons(this, platforms);
+			}).bind(this));
 		});
 	}
 	
