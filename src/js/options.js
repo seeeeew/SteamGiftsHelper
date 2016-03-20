@@ -21,5 +21,9 @@ $("input[type=checkbox]").each(function() {
 	}
 });
 
+$("#reset_platform_cache").click(function() {
+	chrome.storage.local.remove("platforms");
+});
+
 }));
 

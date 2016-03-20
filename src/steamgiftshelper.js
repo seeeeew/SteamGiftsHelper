@@ -41,14 +41,8 @@ var platforms = (function(cache) {
 		chrome.storage.local.set({platforms: JSON.stringify(cache)});
 	}
 	
-	function cache_clear() {
-		cache = {};
-		chrome.storage.local.set({platforms: JSON.stringify(cache)});
-	}
-	
 	return {
-		get: get,
-		clear: cache_clear
+		get: get
 	}
 })($.parseJSON(cache.platforms || "{}"));
 
