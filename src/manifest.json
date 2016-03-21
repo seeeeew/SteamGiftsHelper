@@ -31,7 +31,6 @@
             ]
     	}
     ],
-    "options_page": "options.html",
 	"options_ui": {
 		"chrome_style": true,
 		"page": "options.html"
@@ -39,7 +38,7 @@
     "page_action": {
     	"default_icon": {
     		"19": "img/logo19.png",
-    		"39": "img/logo38.png"
+    		"38": "img/logo38.png"
     	},
     	"default_title": "SteamGifts Helper options",
     	"default_popup": "options.html"
