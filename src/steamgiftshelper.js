@@ -7,6 +7,14 @@ chrome.storage.local.get(storage_local_deferred.resolve);
 
 $($.when(storage_sync_deferred, storage_local_deferred).done(function(settings, cache) {
 
+// reset cache after update
+var version = chrome.runtime.getManifest().version;
+if (version !== cache.version) {
+	chrome.storage.local.clear();
+	cache = {version: version};
+	chrome.storage.local.set(cache);
+}
+
 // platform support cache
 var platforms = (function(cache) {
 	
