@@ -21,8 +21,11 @@ $("input[type=checkbox]").each(function() {
 	}
 });
 
-$("#reset_platform_cache").click(function() {
-	chrome.storage.local.remove("platforms");
+var $reset_platform_cache = $("#reset_platform_cache");
+$reset_platform_cache.click(function() {
+	chrome.storage.local.remove("platforms", function() {
+		$reset_platform_cache.addClass("done");
+	});
 });
 
 }));
