@@ -4,8 +4,10 @@ var storage_sync_deferred = new $.Deferred();
 chrome.storage.sync.get(storage_sync_deferred.resolve);
 var storage_local_deferred = new $.Deferred();
 chrome.storage.local.get(storage_local_deferred.resolve);
+var document_ready_deferred = new $.Deferred();
+$(document).ready(document_ready_deferred.resolve);
 
-$($.when(storage_sync_deferred, storage_local_deferred).done(function(settings, cache) {
+$.when(storage_sync_deferred, storage_local_deferred, document_ready_deferred).done(function(settings, cache) {
 
 // reset cache after update
 var version = chrome.runtime.getManifest().version;
@@ -18,25 +20,8 @@ if (version !== cache.version) {
 // platform support cache
 var platforms = (function(cache) {
 	
-	function get(appid) {
-		cache_clean();
-		var deferred = new $.Deferred();
-		if (cache[appid] !== undefined) {
-			deferred.resolveWith(null, [cache[appid][0]]);
-		} else {
-			var url = "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + appid;
-			$.get(url).done(function(data) {
-				if (!((data[appid] || {}).data || {}).platforms) return;
-				var platforms = data[appid].data.platforms;
-				cache_set(appid, platforms);
-				deferred.resolveWith(null, [platforms]);
-			});
-		}
-		return deferred.promise();
-	}
-	
 	function cache_clean() {
-		var expire_time = parseInt(Date.now() / 1000, 10) - 1 * 60 * 60; // One hour ago
+		var expire_time = parseInt(Date.now() / 1000, 10) - 3600; // One hour ago
 		$.each(cache, function(key, values) {
 			if (values[1] < expire_time) {
 				delete cache[key];
@@ -49,10 +34,28 @@ var platforms = (function(cache) {
 		chrome.storage.local.set({platforms: cache});
 	}
 	
+	function get(appid) {
+		cache_clean();
+		var deferred = new $.Deferred();
+		if (cache[appid] !== undefined) {
+			deferred.resolveWith(null, [cache[appid][0]]);
+		} else {
+			var url = "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + appid;
+			$.get(url).done(function(data) {
+				if (((data[appid] || {}).data || {}).platforms) {
+					var platforms = data[appid].data.platforms;
+					cache_set(appid, platforms);
+					deferred.resolveWith(null, [platforms]);
+				}
+			});
+		}
+		return deferred.promise();
+	}
+	
 	return {
 		get: get
-	}
-})(cache.platforms || {});
+	};
+}(cache.platforms || {}));
 
 // Pin header bar to top
 if ((settings.pin_header || false) === true) {
@@ -67,7 +70,7 @@ $(".sidebar__search-container .fa-search").css("cursor", "pointer");
 if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	// Add platform support icons
 	if ((settings.platform_icons || false) === true) {
-		function add_platform_icons(element, platforms) {
+		var add_platform_icons = function(element, platforms) {
 			var next = element.nextSibling;
 			if (platforms.windows) {
 				$("<i class='giveaway__icon fa fa-windows'></i>").insertBefore(next);
@@ -78,21 +81,22 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 			if (platforms.linux) {
 				$("<i class='giveaway__icon fa fa-linux'></i>").insertBefore(next);
 			}
-		}
+		};
 		
 		$("a.giveaway__icon[href*='//store.steampowered.com/app/']").each(function() {
 			var match = this.href.match(/^[^:]+:\/\/store.steampowered.com\/app\/(\d+)/);
 			var appid = match[1];
-			platforms.get(appid).done((function(platforms) {
-				add_platform_icons(this, platforms);
-			}).bind(this));
+			var element = this;
+			platforms.get(appid).done(function(platforms) {
+				add_platform_icons(element, platforms);
+			});
 		});
 	}
 	
 	var xsrf_token = $("[name=xsrf_token]").val();
 	if (xsrf_token) {
 		if ((settings.enter_button || false) === true || (settings.browsing_search_similar || false) === true) {
-			function click_enter_icon() {
+			var click_enter_icon = function() {
 				var $enter_icon = $(this);
 				var code = $enter_icon.siblings()[0].href.match(/\/giveaway\/([^\/\?]+)/);
 				var $wrapper = $enter_icon.parents(".giveaway__row-inner-wrap").first();
@@ -107,7 +111,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 				}).done(function(data) {
 					var json = $.parseJSON(data);
 					$enter_icon.removeClass("fa-spin fa-refresh");
-					if (json.type == "success") {
+					if (json.type === "success") {
 						if ($wrapper.hasClass("is-faded")) {
 							$wrapper.removeClass("is-faded");
 							$enter_icon.addClass("fa-plus-circle");
@@ -124,7 +128,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 					}
 					$(".nav__points").text(json.points);
 				});
-			}
+			};
 		
 			$("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").each(function() {
 				// Enable entering giveways from browsing page
@@ -167,7 +171,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 					$(".b-close").click();
 					$hide_button.children(".fa").removeClass("fa-spin fa-refresh");
 					$hide_button.children(".fa").addClass("fa-check-circle");
-					if ($(".pinned-giveaways__outer-wrap .giveaway__row-outer-wrap").length == 0) {
+					if ($(".pinned-giveaways__outer-wrap .giveaway__row-outer-wrap").length === 0) {
 						$(".pinned-giveaways__outer-wrap").remove();
 					}
 				});
@@ -186,5 +190,5 @@ if (window.location.pathname.match(/^\/giveaway\//)) {
 	}
 }
 
-}));
+});
 
