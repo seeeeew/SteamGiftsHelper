@@ -38,13 +38,13 @@ var platforms = (function(cache) {
 	
 	function cache_set(appid, platforms) {
 		cache[appid] = [platforms, parseInt(Date.now() / 1000, 10)];
-		chrome.storage.local.set({platforms: JSON.stringify(cache)});
+		chrome.storage.local.set({platforms: cache});
 	}
 	
 	return {
 		get: get
 	}
-})($.parseJSON(cache.platforms || "{}"));
+})(cache.platforms || {});
 
 // Pin header bar to top
 if ((settings.pin_header || false) === true) {
@@ -124,7 +124,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 					var $enter_icon = $("<i class='giveaway__icon fa'></i>");
 					$enter_icon.insertBefore(this);
 					$enter_icon.click(click_enter_icon);
-					if ($($enter_icon.parents()[2]).hasClass("is-faded")) {
+					if ($enter_icon.parents(".giveaway__row-inner-wrap").first().hasClass("is-faded")) {
 						$enter_icon.addClass("fa-minus-circle");
 					} else {
 						$enter_icon.addClass("fa-plus-circle");
