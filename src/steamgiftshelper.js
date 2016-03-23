@@ -21,7 +21,7 @@ if (version !== cache.version) {
 var platforms = (function(cache) {
 	
 	function cache_clean() {
-		var expire_time = parseInt(Date.now() / 1000, 10) - 3600; // One hour ago
+		var expire_time = parseInt(Date.now() / 1000, 10) - 86400; // one day ago
 		$.each(cache, function(key, values) {
 			if (values[1] < expire_time) {
 				delete cache[key];
