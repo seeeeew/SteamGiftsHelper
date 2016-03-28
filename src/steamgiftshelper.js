@@ -29,22 +29,33 @@ var platforms = (function(cache) {
 		});
 	}
 	
-	function cache_set(appid, platforms) {
-		cache[appid] = [platforms, parseInt(Date.now() / 1000, 10)];
+	function cache_set(id, platforms) {
+		cache[id] = [platforms, parseInt(Date.now() / 1000, 10)];
 		chrome.storage.local.set({platforms: cache});
 	}
 	
-	function get(appid) {
+	function get(id) {
 		cache_clean();
 		var deferred = new $.Deferred();
-		if (cache[appid] !== undefined) {
-			deferred.resolveWith(null, [cache[appid][0]]);
+		if (cache[id] !== undefined) {
+			deferred.resolveWith(null, [cache[id][0]]);
 		} else {
-			var url = "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + appid;
+			var [type, itemid] = id.split("/", 2), url;
+			switch(type) {
+				case "app":
+					url = "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + itemid;
+					break;
+				case "sub":
+					url = "http://store.steampowered.com/api/packagedetails/?filters=platforms&packageids=" + itemid;
+					break;
+				default:
+					deferred.reject();
+					return;
+			}
 			$.get(url).done(function(data) {
-				if (((data[appid] || {}).data || {}).platforms) {
-					var platforms = data[appid].data.platforms;
-					cache_set(appid, platforms);
+				if (((data[itemid] || {}).data || {}).platforms) {
+					var platforms = data[itemid].data.platforms;
+					cache_set(id, platforms);
 					deferred.resolveWith(null, [platforms]);
 				}
 			});
@@ -83,13 +94,15 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 			}
 		};
 		
-		$("a.giveaway__icon[href*='//store.steampowered.com/app/']").each(function() {
-			var match = this.href.match(/^[^:]+:\/\/store.steampowered.com\/app\/(\d+)/);
-			var appid = match[1];
-			var element = this;
-			platforms.get(appid).done(function(platforms) {
-				add_platform_icons(element, platforms);
-			});
+		$("a.giveaway__icon[href*='//store.steampowered.com/']").each(function() {
+			var match = this.href.match(/^[^:]+:\/\/store.steampowered.com\/((?:app|sub)\/\d+)/);
+			if (match) {
+				var id = match[1];
+				var element = this;
+				platforms.get(id).done(function(platforms) {
+					add_platform_icons(element, platforms);
+				});
+			}
 		});
 	}
 	
