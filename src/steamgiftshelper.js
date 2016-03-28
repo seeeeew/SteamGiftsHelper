@@ -69,10 +69,14 @@ var platforms = (function(cache) {
 }(cache.platforms || {}));
 
 // synchronize points across tabs
+var previous_points = $(".nav__points").text();
 function updatePoints(points, synchronize) {
-	$(".nav__points").text(points);
-	if (synchronize !== false && (settings.synchronize_points || false) === true) {
-		synchronizePoints(points);
+	if (points != previous_points) {
+		previous_points = points;
+		$(".nav__points").text(points);
+		if (synchronize !== false && (settings.synchronize_points || false) === true) {
+			synchronizePoints(points);
+		}
 	}
 }
 function synchronizePoints(points) {
@@ -83,6 +87,13 @@ if ((settings.synchronize_points || false) === true) {
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		if (message.points) {
 			updatePoints(message.points, false);
+		}
+	});
+	$(".nav__points").bind("DOMSubtreeModified", function() {
+		var points = $(this).text();
+		if (points != "" && points != previous_points) {
+			synchronizePoints(points);
+			previous_points = points;
 		}
 	});
 }
