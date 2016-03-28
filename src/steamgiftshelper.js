@@ -68,6 +68,21 @@ var platforms = (function(cache) {
 	};
 }(cache.platforms || {}));
 
+// synchronize points across tabs
+function updatePoints(points, synchronize) {
+	$(".nav__points").text(points);
+	if (synchronize !== false && (settings.synchronize_points || false) === true) {
+		chrome.runtime.sendMessage({points: points});
+	}
+}
+if ((settings.synchronize_points || false) === true) {
+	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+		if (message.points) {
+			updatePoints(message.points, false);
+		}
+	});
+}
+
 // Pin header bar to top
 if ((settings.pin_header || false) === true) {
 	$("body").addClass("pin_header");
@@ -139,7 +154,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 							$enter_icon.addClass("fa-plus-circle");
 						}
 					}
-					$(".nav__points").text(json.points);
+					updatePoints(json.points);
 				});
 			};
 		
