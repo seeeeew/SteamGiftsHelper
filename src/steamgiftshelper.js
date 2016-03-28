@@ -72,10 +72,14 @@ var platforms = (function(cache) {
 function updatePoints(points, synchronize) {
 	$(".nav__points").text(points);
 	if (synchronize !== false && (settings.synchronize_points || false) === true) {
-		chrome.runtime.sendMessage({points: points});
+		synchronizePoints(points);
 	}
 }
+function synchronizePoints(points) {
+	chrome.runtime.sendMessage({points: points});
+}
 if ((settings.synchronize_points || false) === true) {
+	synchronizePoints($(".nav__points").text());
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		if (message.points) {
 			updatePoints(message.points, false);
