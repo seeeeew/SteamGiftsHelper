@@ -83,7 +83,10 @@ function synchronizePoints(points) {
 	chrome.runtime.sendMessage({points: points});
 }
 if ((settings.synchronize_points || false) === true) {
-	synchronizePoints($(".nav__points").text());
+	chrome.runtime.sendMessage({
+		points: $(".nav__points").text(),
+		refresh_points_interval: (settings.synchronize_points && settings.refresh_points) ? settings.refresh_points_interval : null
+	});
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		if (message.points) {
 			updatePoints(message.points, false);
