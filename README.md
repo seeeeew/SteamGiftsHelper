@@ -19,6 +19,7 @@ or you can install it manually:
 
 ### All pages
 * Add platform icons
+* Synchronize points across tabs
 * Options dialog
 
 ### Giveway browsing pages
