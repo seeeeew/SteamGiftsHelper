@@ -194,32 +194,6 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 				}
 			});
 		}
-	
-		// Enable hiding games without page refresh
-		if ((settings.ajax_hide || false) === true) {
-			var $form = $(".popup--hide-games form");
-			$form.replaceWith("<div>" + $form.html() + "</div>");
-			var $hide_button = $(".popup--hide-games .form__submit-button");
-			$hide_button.click(function() {
-				var game_id = $(".popup--hide-games [name=game_id]").val();
-				$.post({
-					url: "",
-					data: "xsrf_token=" + xsrf_token + "&do=hide_giveaways_by_game_id&game_id=" + game_id,
-					beforeSend: function() {
-						$hide_button.children(".fa").removeClass("fa-check-circle");
-						$hide_button.children(".fa").addClass("fa-spin fa-refresh");
-					}
-				}).done(function() {
-					$("[data-game-id=" + game_id + "]").closest(".giveaway__row-outer-wrap").remove();
-					$(".b-close").click();
-					$hide_button.children(".fa").removeClass("fa-spin fa-refresh");
-					$hide_button.children(".fa").addClass("fa-check-circle");
-					if ($(".pinned-giveaways__outer-wrap .giveaway__row-outer-wrap").length === 0) {
-						$(".pinned-giveaways__outer-wrap").remove();
-					}
-				});
-			});
-		}
 	}
 }
 

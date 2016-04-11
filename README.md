@@ -24,7 +24,6 @@ or you can install it manually:
 ### Giveway browsing pages
 * Pin the header bar to the top
 * Enter giveaways from browsing page
-* Hide games without page refresh
 * Find similar giveaways
 
 ### Giveaway detail pages
