@@ -12,15 +12,15 @@
 	},
 	"version": "1.1",
     "permissions": [
-        "http://www.steamgifts.com/",
-        "http://store.steampowered.com/",
+        "*://www.steamgifts.com/",
+        "*://store.steampowered.com/",
         "tabs",
         "storage"
     ],
     "content_scripts": [
     	{
             "matches": [
-            	"http://www.steamgifts.com/*"
+            	"*://www.steamgifts.com/*"
             ],
             "js": [
             	"js/jquery.min.js",
