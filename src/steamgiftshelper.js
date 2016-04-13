@@ -43,10 +43,10 @@ var platforms = (function(cache) {
 			var [type, itemid] = id.split("/", 2), url;
 			switch(type) {
 				case "app":
-					url = "http://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + itemid;
+					url = "*://store.steampowered.com/api/appdetails/?filters=platforms&appids=" + itemid;
 					break;
 				case "sub":
-					url = "http://store.steampowered.com/api/packagedetails/?filters=platforms&packageids=" + itemid;
+					url = "*://store.steampowered.com/api/packagedetails/?filters=platforms&packageids=" + itemid;
 					break;
 				default:
 					deferred.reject();
