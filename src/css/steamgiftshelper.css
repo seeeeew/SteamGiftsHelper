@@ -11,9 +11,4 @@ body.pin_header .featured__container, body.pin_header .header__error {
 body.pin_header .page__outer-wrap {
 	margin-top: 39px;
 }
-.featured__heading .search_similar {
-	font-size: 20px;
-	opacity: 0.5;
-	cursor: pointer;
-}
 
