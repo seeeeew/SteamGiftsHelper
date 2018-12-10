@@ -138,7 +138,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	
 	var xsrf_token = $("[name=xsrf_token]").val();
 	if (xsrf_token) {
-		if ((settings.enter_button || false) === true || (settings.browsing_search_similar || false) === true) {
+		if ((settings.enter_button || false) === true) {
 			var click_enter_icon = function() {
 				var $enter_icon = $(this);
 				var code = $enter_icon.siblings()[0].href.match(/\/giveaway\/([^\/\?]+)/);
@@ -185,25 +185,8 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 						$enter_icon.addClass("fa-plus-circle");
 					}
 				}
-			
-				// Find similar giveaways
-				if ((settings.browsing_search_similar || false) === true) {
-					var game_name = $(this).siblings().first().text();
-					var $search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar giveaway__icon fa fa-search'></a>");
-					$search_icon.insertBefore(this);
-				}
 			});
 		}
-	}
-}
-
-// Giveaway detail pages
-if (window.location.pathname.match(/^\/giveaway\//)) {
-	// Find similar giveaways
-	if ((settings.detail_search_similar || false) === true) {
-		var game_name = $(".featured__heading > :first-child").text();
-		var $search_icon = $("<a href='/giveaways/search?q=" + encodeURIComponent(game_name) + "' class='search_similar fa fa-search'></a>");
-		$(".featured__heading").append($search_icon);
 	}
 }
 
