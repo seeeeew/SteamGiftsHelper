@@ -20,12 +20,8 @@ or you can install it manually:
 ### All pages
 * Add platform icons
 * Synchronize points across tabs
-* Options dialog
 
 ### Giveway browsing pages
 * Pin the header bar to the top
 * Enter giveaways from browsing page
-* Find similar giveaways
 
-### Giveaway detail pages
-* Find similar giveaways
