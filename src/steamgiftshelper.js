@@ -103,10 +103,6 @@ if ((settings.pin_header || false) === true) {
 	$("body").addClass("pin_header");
 }
 
-// clickable magnifying glass in search boxes
-$(".sidebar__search-container .fa-search").attr("onclick", '$(".sidebar__search-input").trigger($.Event("keypress", {which: 13}));');
-$(".sidebar__search-container .fa-search").css("cursor", "pointer");
-
 // Giveaway browsing pages
 if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	// Add platform support icons
