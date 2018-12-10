@@ -23,7 +23,6 @@
             	"*://www.steamgifts.com/*"
             ],
             "js": [
-            	"js/jquery.min.js",
             	"steamgiftshelper.js"
             ],
             "css": [
