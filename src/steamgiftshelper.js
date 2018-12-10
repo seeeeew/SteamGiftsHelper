@@ -115,6 +115,13 @@ if ((settings.pin_header || false) === true) {
 	document.body.classList.add("pin_header");
 }
 
+// clickable magnifying glass in search boxes	
+document.querySelector(".sidebar__search-container .fa-search").addEventListener("click", () => {
+	const script = document.createElement("script");
+	script.innerHTML = "$('.sidebar__search-input').trigger($.Event('keypress', {which: 13}));";
+	(document.body || document.head).appendChild(script);
+});
+
 // Giveaway browsing pages
 if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	// Add platform support icons

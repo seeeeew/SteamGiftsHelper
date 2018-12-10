@@ -11,4 +11,7 @@ body.pin_header .featured__container, body.pin_header .header__error {
 body.pin_header .page__outer-wrap {
 	margin-top: 39px;
 }
+.sidebar__search-container .fa-search {
+	cursor: pointer;
+}
 
