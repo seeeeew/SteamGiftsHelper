@@ -116,11 +116,11 @@ if ((settings.pin_header || false) === true) {
 }
 
 // clickable magnifying glass in search boxes	
-document.querySelector(".sidebar__search-container .fa-search").addEventListener("click", () => {
+document.querySelectorAll(".sidebar__search-container .fa-search").forEach((element) => element.addEventListener("click", () => {
 	const script = document.createElement("script");
 	script.innerHTML = "$('.sidebar__search-input').trigger($.Event('keypress', {which: 13}));";
 	(document.body || document.head).appendChild(script);
-});
+}));
 
 // Giveaway browsing pages
 if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
