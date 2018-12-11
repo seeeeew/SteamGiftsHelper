@@ -14,7 +14,16 @@ let document_ready_promise = new Promise((resolve) => {
 	}
 });
 
+let defaultsettings = {
+	pin_header: true,
+	synchronize_points: true,
+	platform_icons: true,
+	enter_button: true
+};
+
 Promise.all([storage_sync_promise, storage_local_promise, document_ready_promise]).then(([settings, cache]) => {
+
+settings = {...defaultsettings, ...settings};
 
 // reset cache after update
 var version = chrome.runtime.getManifest().version;
@@ -86,7 +95,7 @@ function updatePoints(points, synchronize) {
 	if (points != previous_points) {
 		previous_points = points;
 		document.querySelector(".nav__points").innerText = points;
-		if (synchronize !== false && (settings.synchronize_points || false) === true) {
+		if (synchronize !== false && settings.synchronize_points) {
 			synchronizePoints(points);
 		}
 	}
@@ -94,7 +103,7 @@ function updatePoints(points, synchronize) {
 function synchronizePoints(points) {
 	chrome.runtime.sendMessage({points: points});
 }
-if ((settings.synchronize_points || false) === true) {
+if (settings.synchronize_points) {
 	synchronizePoints(document.querySelector(".nav__points").innerText);
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		if (message.points) {
@@ -111,7 +120,7 @@ if ((settings.synchronize_points || false) === true) {
 }
 
 // Pin header bar to top
-if ((settings.pin_header || false) === true) {
+if (settings.pin_header) {
 	document.body.classList.add("pin_header");
 }
 
@@ -125,7 +134,7 @@ document.querySelectorAll(".sidebar__search-container .fa-search").forEach((elem
 // Giveaway browsing pages
 if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	// Add platform support icons
-	if ((settings.platform_icons || false) === true) {
+	if (settings.platform_icons) {
 		var add_platform_icons = function(element, platforms) {
 			var next = element.nextSibling;
 			if (platforms.windows) {
@@ -157,7 +166,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	
 	var xsrf_token = document.querySelector("[name=xsrf_token]").value;
 	if (xsrf_token) {
-		if ((settings.enter_button || false) === true) {
+		if (settings.enter_button) {
 			var click_enter_icon = function(event) {
 				var enter_icon = event.target;
 				var code = enter_icon.parentElement.firstElementChild.href.match(/\/giveaway\/([^\/\?]+)/);
@@ -194,7 +203,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 		
 			document.querySelectorAll("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").forEach((element) => {
 				// Enable entering giveways from browsing page
-				if ((settings.enter_button || false) === true) {
+				if (settings.enter_button) {
 					var enter_icon = document.createElement("i");
 					enter_icon.classList.add("giveaway__icon", "fa");
 					element.parentNode.insertBefore(enter_icon, element);

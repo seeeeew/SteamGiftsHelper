@@ -14,7 +14,16 @@ let document_ready_promise = new Promise((resolve) => {
 	}
 });
 
+let defaultsettings = {
+	pin_header: true,
+	synchronize_points: true,
+	platform_icons: true,
+	enter_button: true
+};
+
 Promise.all([storage_sync_promise, storage_local_promise, document_ready_promise]).then(([settings, cache]) => {
+
+settings = {...defaultsettings, ...settings};
 
 document.querySelectorAll("input[type=checkbox]").forEach((element) => {
 	element.addEventListener("change", (event) => {
