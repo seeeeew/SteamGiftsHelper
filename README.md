@@ -20,6 +20,7 @@ or you can install it manually:
 ### All pages
 * Add platform icons
 * Synchronize points across tabs
+* Clickable magnifying glass in search boxes
 
 ### Giveway browsing pages
 * Pin the header bar to the top
