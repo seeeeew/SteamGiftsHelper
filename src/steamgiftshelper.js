@@ -3,9 +3,6 @@
 let storage_sync_promise = new Promise((resolve) => {
 	chrome.storage.sync.get(resolve);
 });
-let storage_local_promise = new Promise((resolve) => {
-	chrome.storage.local.get(resolve);
-});
 let document_ready_promise = new Promise((resolve) => {
 	if (/^(complete|loaded|interactive)$/.test(document.readyState)) {
 		resolve();
@@ -21,17 +18,9 @@ let defaultsettings = {
 	enter_button: true
 };
 
-Promise.all([storage_sync_promise, storage_local_promise, document_ready_promise]).then(([settings, cache]) => {
+Promise.all([storage_sync_promise, document_ready_promise]).then(([settings]) => {
 
 settings = {...defaultsettings, ...settings};
-
-// reset cache after update
-const version = chrome.runtime.getManifest().version;
-if (version !== cache.version) {
-	chrome.storage.local.clear();
-	cache = {version: version};
-	chrome.storage.local.set(cache);
-}
 
 function requestJSON(method, url, parameters) {
 	return new Promise((resolve) => {
@@ -47,55 +36,11 @@ function requestJSON(method, url, parameters) {
 }
 
 // platform support cache
-const Platforms = (function(cache) {
-	
-	function cache_clean() {
-		const expire_time = parseInt(Date.now() / 1000, 10) - 86400; // one day ago
-		for (const [key, values] of Object.entries(cache)) {
-			if (values[1] < expire_time) {
-				delete cache[key];
-			}
-		}
-	}
-	
-	function cache_set(id, platforms) {
-		cache[id] = [platforms, parseInt(Date.now() / 1000, 10)];
-		chrome.storage.local.set({platforms: cache});
-	}
-	
-	function get(id) {
-		cache_clean();
-		return new Promise((resolve, reject) => {
-			if (cache[id] !== undefined) {
-				resolve(cache[id][0]);
-			} else {
-				let [type, itemid] = id.split("/", 2), url;
-				switch(type) {
-					case "app":
-						url = "//store.steampowered.com/api/appdetails/?filters=platforms&appids=" + itemid;
-						break;
-					case "sub":
-						url = "//store.steampowered.com/api/packagedetails/?filters=platforms&packageids=" + itemid;
-						break;
-					default:
-						reject();
-						return;
-				}
-				requestJSON("GET", url).then((data) => {
-					if (((data[itemid] || {}).data || {}).platforms) {
-						const platforms = data[itemid].data.platforms;
-						cache_set(id, platforms);
-						resolve(platforms);
-					}
-				});
-			}
-		});
-	}
-	
-	return {
-		get
-	};
-}(cache.platforms || {}));
+const Platforms = {
+	get: (id) => new Promise((resolve) => {
+		chrome.runtime.sendMessage({platformLookup: id}, resolve);
+	})
+};
 
 // synchronize points across tabs
 let previous_points = document.querySelector(".nav__points").innerText;
