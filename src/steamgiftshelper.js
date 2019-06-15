@@ -43,11 +43,15 @@ const Platforms = {
 };
 
 // synchronize points across tabs
-let previous_points = document.querySelector(".nav__points").innerText;
+const pointsElement = document.querySelector(".nav__points");
+let previous_points;
+if (pointsElement) {
+	previous_points = pointsElement.innerText;
+}
 function updatePoints(points, synchronize) {
-	if (points != previous_points) {
+	if (pointsElement && points != previous_points) {
 		previous_points = points;
-		document.querySelector(".nav__points").innerText = points;
+		pointsElement.innerText = points;
 		if (synchronize !== false && settings.synchronize_points) {
 			synchronizePoints(points);
 		}
@@ -56,14 +60,14 @@ function updatePoints(points, synchronize) {
 function synchronizePoints(points) {
 	chrome.runtime.sendMessage({points: points});
 }
-if (settings.synchronize_points) {
-	synchronizePoints(document.querySelector(".nav__points").innerText);
+if (pointsElement && settings.synchronize_points) {
+	synchronizePoints(pointsElement.innerText);
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		if (message.points) {
 			updatePoints(message.points, false);
 		}
 	});
-	document.querySelector(".nav__points").addEventListener("DOMSubtreeModified", (event) => {
+	pointsElement.addEventListener("DOMSubtreeModified", (event) => {
 		const points = event.target.innerText;
 		if (points !== "" && points !== previous_points) {
 			synchronizePoints(points);
@@ -88,7 +92,7 @@ document.querySelectorAll(".sidebar__search-container .fa-search").forEach((elem
 if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 	// Add platform support icons
 	if (settings.platform_icons) {
-		const add_platform_icons = function(element, platforms) {
+		const add_platform_icons = function(element, platforms = {}) {
 			const next = element.nextSibling;
 			if (platforms.windows) {
 				const icon = document.createElement("i");
@@ -117,52 +121,55 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 		});
 	}
 	
-	const xsrf_token = document.querySelector("[name=xsrf_token]").value;
-	if (xsrf_token) {
-		if (settings.enter_button) {
-			const click_enter_icon = function(event) {
-				const enter_icon = event.target;
-				const code = enter_icon.parentElement.firstElementChild.href.match(/\/giveaway\/([^\/\?]+)/);
-				const wrapper = enter_icon.closest(".giveaway__row-inner-wrap");
-				const entered = wrapper.classList.contains("is-faded");
-				enter_icon.classList.remove("fa-plus-circle", "fa-minus-circle");
-				enter_icon.classList.add("fa-spin", "fa-refresh");
-				const parameters = "xsrf_token=" + encodeURIComponent(xsrf_token) + "&do=entry_" + (entered ? "delete" : "insert") + "&code=" + encodeURIComponent(code[1]);
-				requestJSON("POST", "/ajax.php", parameters).then((data) => {
-					enter_icon.classList.remove("fa-spin", "fa-refresh");
-					if (data.type === "success") {
-						if (wrapper.classList.contains("is-faded")) {
-							wrapper.classList.remove("is-faded");
-							enter_icon.classList.add("fa-plus-circle");
+	const xsrfElement = document.querySelector("[name=xsrf_token]");
+	if (xsrfElement) {
+		const xsrf_token = xsrfElement.value;
+		if (xsrfElement && xsrf_token) {
+			if (settings.enter_button) {
+				const click_enter_icon = function(event) {
+					const enter_icon = event.target;
+					const code = enter_icon.parentElement.firstElementChild.href.match(/\/giveaway\/([^\/\?]+)/);
+					const wrapper = enter_icon.closest(".giveaway__row-inner-wrap");
+					const entered = wrapper.classList.contains("is-faded");
+					enter_icon.classList.remove("fa-plus-circle", "fa-minus-circle");
+					enter_icon.classList.add("fa-spin", "fa-refresh");
+					const parameters = "xsrf_token=" + encodeURIComponent(xsrf_token) + "&do=entry_" + (entered ? "delete" : "insert") + "&code=" + encodeURIComponent(code[1]);
+					requestJSON("POST", "/ajax.php", parameters).then((data) => {
+						enter_icon.classList.remove("fa-spin", "fa-refresh");
+						if (data.type === "success") {
+							if (wrapper.classList.contains("is-faded")) {
+								wrapper.classList.remove("is-faded");
+								enter_icon.classList.add("fa-plus-circle");
+							} else {
+								wrapper.classList.add("is-faded");
+								enter_icon.classList.add("fa-minus-circle");
+							}
 						} else {
-							wrapper.classList.add("is-faded");
-							enter_icon.classList.add("fa-minus-circle");
+							if (wrapper.classList.contains("is-faded")) {
+								enter_icon.classList.add("fa-minus-circle");
+							} else {
+								enter_icon.classList.add("fa-plus-circle");
+							}
 						}
-					} else {
-						if (wrapper.classList.contains("is-faded")) {
+						updatePoints(data.points);
+					});
+				};
+			
+				document.querySelectorAll("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").forEach((element) => {
+					// Enable entering giveways from browsing page
+					if (settings.enter_button) {
+						const enter_icon = document.createElement("i");
+						enter_icon.classList.add("giveaway__icon", "fa");
+						element.parentNode.insertBefore(enter_icon, element);
+						enter_icon.addEventListener("click", click_enter_icon);
+						if (enter_icon.closest(".giveaway__row-inner-wrap").classList.contains("is-faded")) {
 							enter_icon.classList.add("fa-minus-circle");
 						} else {
 							enter_icon.classList.add("fa-plus-circle");
 						}
 					}
-					updatePoints(data.points);
 				});
-			};
-		
-			document.querySelectorAll("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").forEach((element) => {
-				// Enable entering giveways from browsing page
-				if (settings.enter_button) {
-					const enter_icon = document.createElement("i");
-					enter_icon.classList.add("giveaway__icon", "fa");
-					element.parentNode.insertBefore(enter_icon, element);
-					enter_icon.addEventListener("click", click_enter_icon);
-					if (enter_icon.closest(".giveaway__row-inner-wrap").classList.contains("is-faded")) {
-						enter_icon.classList.add("fa-minus-circle");
-					} else {
-						enter_icon.classList.add("fa-plus-circle");
-					}
-				}
-			});
+			}
 		}
 	}
 }
