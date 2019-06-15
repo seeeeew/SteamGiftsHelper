@@ -89,7 +89,7 @@ document.querySelectorAll(".sidebar__search-container .fa-search").forEach((elem
 }));
 
 // Giveaway browsing pages
-if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
+if (window.location.pathname.match(/^\/(?:$|giveaways?\/)/)) {
 	// Add platform support icons
 	if (settings.platform_icons) {
 		const add_platform_icons = function(element, platforms = {}) {
@@ -111,7 +111,8 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 			}
 		};
 		
-		document.querySelectorAll("a.giveaway__icon[href*='//store.steampowered.com/']").forEach((element) => {
+		document.querySelectorAll("a[href*='//store.steampowered.com/']").forEach((element) => {
+			if (!element.querySelector("i.fa.fa-steam")) return;
 			const match = element.href.match(/^[^:]+:\/\/store.steampowered.com\/((?:app|sub)\/\d+)/);
 			if (match) {
 				Platforms.get(match[1]).then((platforms) => {
@@ -121,6 +122,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 		});
 	}
 	
+	// Enable entering giveways from browsing page
 	const xsrfElement = document.querySelector("[name=xsrf_token]");
 	if (xsrfElement) {
 		const xsrf_token = xsrfElement.value;
@@ -156,7 +158,6 @@ if (window.location.pathname.match(/^\/(?:$|giveaways\/)/)) {
 				};
 			
 				document.querySelectorAll("a.giveaway__icon[href*='//store.steampowered.com/app/'], a.giveaway__icon[href*='//store.steampowered.com/sub/']").forEach((element) => {
-					// Enable entering giveways from browsing page
 					if (settings.enter_button) {
 						const enter_icon = document.createElement("i");
 						enter_icon.classList.add("giveaway__icon", "fa");
