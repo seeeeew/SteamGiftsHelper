@@ -23,16 +23,13 @@ Promise.all([storage_sync_promise, document_ready_promise]).then(([settings]) =>
 settings = {...defaultsettings, ...settings};
 
 function requestJSON(method, url, parameters) {
-	return new Promise((resolve) => {
-		const xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState != 4 || xhr.status != 200) return;
-			resolve(JSON.parse(xhr.responseText));
-		};
-		xhr.open(method, url);
-		if (method === "POST") xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send(parameters);
-	});
+	const headers = new Headers();
+	if (method.toLowerCase() === "post") headers.set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+	return fetch(url, {
+		method,
+		headers,
+		body: new URLSearchParams(parameters).toString()
+	}).then((response) => response.json());
 }
 
 // platform support cache
@@ -126,16 +123,20 @@ if (window.location.pathname.match(/^\/(?:$|giveaways?\/)/)) {
 	const xsrfElement = document.querySelector("[name=xsrf_token]");
 	if (xsrfElement) {
 		const xsrf_token = xsrfElement.value;
-		if (xsrfElement && xsrf_token) {
+		if (xsrf_token) {
 			if (settings.enter_button) {
 				const click_enter_icon = function(event) {
 					const enter_icon = event.target;
-					const code = enter_icon.parentElement.firstElementChild.href.match(/\/giveaway\/([^\/\?]+)/);
+					const code = enter_icon.parentElement.firstElementChild.href.match(/\/giveaway\/([^\/\?]+)/)[1];
 					const wrapper = enter_icon.closest(".giveaway__row-inner-wrap");
 					const entered = wrapper.classList.contains("is-faded");
 					enter_icon.classList.remove("fa-plus-circle", "fa-minus-circle");
 					enter_icon.classList.add("fa-spin", "fa-refresh");
-					const parameters = "xsrf_token=" + encodeURIComponent(xsrf_token) + "&do=entry_" + (entered ? "delete" : "insert") + "&code=" + encodeURIComponent(code[1]);
+					const parameters = {
+						xsrf_token,
+						do: "entry_" + (entered ? "delete" : "insert"),
+						code
+					};
 					requestJSON("POST", "/ajax.php", parameters).then((data) => {
 						enter_icon.classList.remove("fa-spin", "fa-refresh");
 						if (data.type === "success") {
