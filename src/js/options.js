@@ -21,25 +21,25 @@ let defaultsettings = {
 	enter_button: true
 };
 
-Promise.all([storage_sync_promise, storage_local_promise, document_ready_promise]).then(([settings, cache]) => {
+Promise.all([storage_sync_promise, storage_local_promise, document_ready_promise]).then(([settings]) => {
 
-settings = {...defaultsettings, ...settings};
+	settings = {...defaultsettings, ...settings};
 
-document.querySelectorAll("input[type=checkbox]").forEach((element) => {
-	element.addEventListener("change", (event) => {
-		chrome.storage.sync.set({[event.target.id]: event.target.checked});
+	document.querySelectorAll("input[type=checkbox]").forEach((element) => {
+		element.addEventListener("change", (event) => {
+			chrome.storage.sync.set({[event.target.id]: event.target.checked});
+		});
+		if (!(element.id in settings)) {
+			settings[element.id] = true;
+		}
+		element.checked = settings[element.id];
 	});
-	if (!settings.hasOwnProperty(element.id)) {
-		settings[element.id] = true;
-	}
-	element.checked = settings[element.id];
-});
 
-reset_platform_cache.addEventListener("click", (event) => {
-	chrome.storage.local.remove("platforms", () => {
-		event.target.classList.add("done");
+	document.querySelector("#reset_platform_cache").addEventListener("click", (event) => {
+		chrome.storage.local.remove("platforms", () => {
+			event.target.classList.add("done");
+		});
 	});
-});
 
 });
 
