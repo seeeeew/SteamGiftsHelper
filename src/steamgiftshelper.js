@@ -176,5 +176,7 @@ if (window.location.pathname.match(/^\/(?:$|giveaways?\/)/)) {
 	}
 }
 
+console.log(`SteamGifts Helper v${chrome.runtime.getManifest().version} loaded (${chrome.runtime.getManifest().homepage_url})`);
+
 });
 
