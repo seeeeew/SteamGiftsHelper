@@ -1,9 +1,9 @@
 "use strict";
 
-let storage_sync_promise = new Promise((resolve) => {
+const storage_sync_promise = new Promise((resolve) => {
 	chrome.storage.sync.get(resolve);
 });
-let document_ready_promise = new Promise((resolve) => {
+const document_ready_promise = new Promise((resolve) => {
 	if (/^(complete|loaded|interactive)$/.test(document.readyState)) {
 		resolve();
 	} else {
@@ -11,7 +11,7 @@ let document_ready_promise = new Promise((resolve) => {
 	}
 });
 
-let defaultsettings = {
+const defaultsettings = {
 	pin_header: true,
 	synchronize_points: true,
 	platform_icons: true,
@@ -64,13 +64,14 @@ Promise.all([storage_sync_promise, document_ready_promise]).then(([settings]) =>
 				updatePoints(message.points, false);
 			}
 		});
-		pointsElement.addEventListener("DOMSubtreeModified", (event) => {
-			const points = event.target.innerText;
+		const observer = new MutationObserver((mutation) => {
+			const points = mutation.target.innerText;
 			if (points !== "" && points !== previous_points) {
 				synchronizePoints(points);
 				previous_points = points;
 			}
 		});
+		observer.observe(pointsElement, {characterData: true});
 	}
 
 	// Pin header bar to top

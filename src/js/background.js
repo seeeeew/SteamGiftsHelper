@@ -62,11 +62,6 @@ chrome.storage.local.get((cache) => {
 		};
 	}(cache.platforms || {}));
 
-	function checkForValidUrl(tabId, changeInfo, tab) {
-		if (tab.url.match(/https?:\/\/www\.steamgifts\.com/)) {
-			chrome.pageAction.show(tabId);
-		}
-	}
 	function messageHandler(message, sender, sendResponse) {
 		if (message.points) {
 			relayMessage(message, sender);
@@ -86,7 +81,6 @@ chrome.storage.local.get((cache) => {
 		});
 	}
 
-	chrome.tabs.onUpdated.addListener(checkForValidUrl);
 	chrome.runtime.onMessage.addListener(messageHandler);
 
 });
